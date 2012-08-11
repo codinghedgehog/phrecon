@@ -1,0 +1,26 @@
+Phrecon (Phylo Reconstructor)
+
+This script reconstructs the base sequence using an SNP loci and substituting its bases in at the given locations in the
+provided reference base sequence.
+
+The base reference should only have TWO columns (and no headers), consisting of just the base location and base.
+
+The SNP input file may contain multiple SNP "fragments" (ids), and phrecon will generate a new sequence for each one
+and write them out in FASTA format into the same output file.
+
+SNP file input should contain three columns and no headers:
+SNP_ID (i.e. query id) | Base position | Base
+
+So something like:
+A12 1045  G
+A12 4056  A
+A12 13004 T
+A35 4 A
+A35 401 C
+
+The above example contains two query SNPs, so phrecon will generate a FASTA file containing the full sequence for each.
+
+Prephix's SNP and base ref output files can be used by phrecon as input.
+
+Usage: phrecon.pl <reference base file> <SNP loci input file>
+
