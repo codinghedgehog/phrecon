@@ -27,7 +27,7 @@
 # Usage: phrecon.py <reference base file> <SNP loci input file> [-debug] [-quiet]
 #
 # 8/2/2013 - Version 3 - Andrew Pann, Ported version 2.1 of Perl-based Phrecon to Python, using Biopython and Sqlite3.
-# 8/4/2013 - Version 3.1 - Andrew Pann, Added multiprocessing to leverage multi-CPU performance.
+# 8/4/2013 - Version 3.1 - Andrew Pann, Reverted to normal port using dictionaries and Biopython (no database).
 
 import argparse
 import os
