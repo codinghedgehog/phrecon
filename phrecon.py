@@ -127,6 +127,9 @@ if args.dbfile != None:
         sys.exit(1)
     else:
         dbconn = sqlite3.connect(dbfilename)
+        dbconn.execute("PRAGMA synchronous = OFF")
+        dbconn.execute("PRAGMA temp_store = MEMORY")
+        dbconn.execute("PRAGMA journal_mode = MEMORY")
 else:
     dbconn = sqlite3.connect(':memory:')
 
@@ -257,9 +260,9 @@ straincursor = dbconn.cursor()
 straincursor.execute('''select distinct strainid from SNP_DATA order by strainid;''')
 for strainRow in straincursor.fetchall():
     currentStrainID = strainRow[0]
-    print_all("Now reconstructing strain {}\n".format(currentStrainID))
+    print_all("Now reconstructing strain {}".format(currentStrainID))
 
-    dbcursor.execute('''select group_concat(base,"") from (select locus,base from REF_DATA where locus not in (select locus from SNP_DATA where strainid = ?) UNION select locus,base from SNP_DATA where strainid=? order by locus asc);''',(currentStrainID,currentStrainID))
+    dbcursor.execute('''select group_concat(coalesce(b.base,a.base),"") from REF_DATA a LEFT OUTER JOIN SNP_DATA b on a.locus = b.locus and b.strainid=?  order by a.locus asc;''',(currentStrainID,))
     dbresult = dbcursor.fetchone()
 
     snpSequenceString = dbresult[0]
