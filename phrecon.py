@@ -259,7 +259,7 @@ for strainRow in straincursor.fetchall():
     currentStrainID = strainRow[0]
     print_all("Now reconstructing strain {}\n".format(currentStrainID))
 
-    dbcursor.execute('''select group_concat(base,"") from (select locus,base from REF_DATA where locus not in (select locus from SNP_DATA where strainid = 5) UNION select locus,base from SNP_DATA where strainid=? order by locus asc);''',(currentStrainID,))
+    dbcursor.execute('''select group_concat(base,"") from (select locus,base from REF_DATA where locus not in (select locus from SNP_DATA where strainid = ?) UNION select locus,base from SNP_DATA where strainid=? order by locus asc);''',(currentStrainID,currentStrainID))
     dbresult = dbcursor.fetchone()
 
     snpSequenceString = dbresult[0]
