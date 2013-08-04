@@ -38,8 +38,6 @@ import Bio.Seq
 import Bio.SeqIO
 import Bio.SeqRecord
 import Bio.Alphabet
-import multiprocessing
-import collections
 
 VERSION = "3.1"
 
