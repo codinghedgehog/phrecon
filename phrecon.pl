@@ -30,17 +30,25 @@
 # 1/26/2012 - Andrew Pann, made errors of duplicate loci and nonexistent ref loci to be warnings, instead of hard errors.  Also allow alphanumeric strain IDs.
 # 1/27/2012 - Andrew Pann, added log file and support for -debug and -quiet flag.
 # 2/02/2012 - Andrew Pann, added failure message on errors, even in quiet mode.  No silent failures!
+# 8/04/2013 - Andrew Pann, Added deprecation message, changed output to 60-character lines instead of 70, removed extraneous newlines.
 
 use strict;
 
-my $VERSION="2.1";
+my $VERSION="2.2";
 
 print "\nPhrecon (Phylo Reconstructor) v$VERSION\n\n";
+
+print "\n****************************************************************************\n";
+print "**** WARNING: The perl version of phrecon is now DEPRECATED and UNSUPPORTED!\n";
+print "****          Please use the PYTHON version instead (phrecon.py).\n";
+print "****************************************************************************\n";
 
 if ($#ARGV < 1){
   print "Usage: $0 <reference base file> <SNP loci input file> [-debug] [-quiet]\n";
   exit 1;
 }
+
+sleep 5;
 
 my $infile;
 my $reffile;
@@ -124,14 +132,13 @@ foreach $loci (sort {$a <=> $b} keys %baseRefTable){
 
   $charCount++;
 
-  # Limit to 70 chars per line, for FASTA compliance.
-  if ($charCount eq 70){
+  # Limit to 60 chars per line, for FASTA compliance.
+  if ($charCount eq 60){
     print $outfile "\n";
     $charCount = 0;
   }
 
 }
-print $outfile "\n";
 
 $i = 0;
 # For each strain in the input file, output the full sequence.
@@ -168,7 +175,7 @@ while (<$infile>){
       $charCount++;
 
       # Limit to 70 chars per line, for FASTA compliance.
-      if ($charCount eq 70){
+      if ($charCount eq 60){
         print $outfile "\n";
 	$charCount = 0;
       }
@@ -210,7 +217,7 @@ foreach $loci (sort {$a <=> $b} keys %outputTable){
   $charCount++;
 
   # Limit to 70 chars per line, for FASTA compliance.
-  if ($charCount eq 70){
+  if ($charCount eq 60){
     print $outfile "\n";
     $charCount = 0;
   }
@@ -221,6 +228,11 @@ print $outfile "\n";
 print_all("\n$strainCount strains processed from SNP loci input file.\n");
 print_all("\n$warnings warnings were detected.\n");
 print "Log file for this run can be found in $ARGV[1].reconstructed.log \n";
+
+print "\n****************************************************************************\n";
+print "**** WARNING: The perl version of phrecon is now DEPRECATED and UNSUPPORTED!\n";
+print "****          Please use the PYTHON version instead (phrecon.py).\n";
+print "****************************************************************************\n";
 
 close($infile);
 close($outfile);
