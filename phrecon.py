@@ -24,11 +24,15 @@
 #
 # Prephix's SNP and base ref output files can be used by phrecon as input.
 #
+# If the SNP line has a locus of -1 and base "-", and it is the ONLY line for that strainid, then it is treated as
+# an empty SNP -- i.e. the same sequence as the ref base (since there are no SNPs reported for that strain).
+#
 # Usage: phrecon.py <reference base file> <SNP loci input file> [-debug] [-quiet]
 #
 # 8/2/2013 - Version 3 - Andrew Pann, Ported version 2.1 of Perl-based Phrecon to Python, using Biopython and Sqlite3.
 # 8/4/2013 - Version 3.1 - Andrew Pann, Reverted to normal port using dictionaries and Biopython (no database).
 # 8/4/2013 - Version 4.0 - Andrew Pann, Added use of multiprocessing.
+# 8/2/2013 - Version 4.1 - Andrew Pann, Added handling of empty strain SNP data.
 
 import argparse
 import os
@@ -43,7 +47,7 @@ import multiprocessing
 import pprint
 import signal
 
-VERSION = "4.0"
+VERSION = "4.1"
 
 #####################
 # UTILITY FUNCTIONS
@@ -87,10 +91,17 @@ def mp_reconstruct_strain(myStrainID,myStrainData,myRefData):
        the string representing the reconstructed snp sequence,
        or an Exception object as the second two-tuple value if
        there is an error.
+
+       If the strain data has one entry of locus -1 and base '-', 
+       then it is assumed to be from an empty SNP file (no SNPs),
+       so will return the base reference sequence.
     '''
     try:
-        strainData = myRefData.copy()
-        strainData.update(myStrainData)
+        if len(myStrainData) == 1 and myStrainData[0] == "-1":
+            strainData = myRefData.copy()
+        else:
+            strainData = myRefData.copy()
+            strainData.update(myStrainData)
 
         strainKeys = strainData.keys()
         strainKeys.sort()
@@ -203,7 +214,7 @@ if __name__ == '__main__':
     strainCount = 0
     strainNameList = [] # Store strain IDs in a list to preserve order when writing to file later.
     # Expect snp data file lines to be in a three-column format: StrainID Loci Base
-    snpRe = re.compile("^(?P<strainid>\S+)\t(?P<locus>\d+)\t(?P<base>[A-Z]+)$")
+    snpRe = re.compile("^(?P<strainid>\S+)\t(?P<locus>\d+|(-1))\t(?P<base>[A-Z]+|-)$")
     currentStrain = ""
     snpData = {}
     for line in infile:
@@ -261,7 +272,7 @@ if __name__ == '__main__':
     seqRecordList.append(refSeqRecord)
         
     ##################
-    # MULTIPROCESSING -- Reconstruct the input strains in parllel and store those into the sequence record array.
+    # MULTIPROCESSING -- Reconstruct the input strains in parallel and store those into the sequence record array.
     ##################
 
     # Setup a lock -- this is just to neatly interleave output to the log file (otherwise missing or garbles lines can occur).
