@@ -47,7 +47,7 @@ import multiprocessing
 import pprint
 import signal
 
-VERSION = "4.1"
+VERSION = "4.1.1"
 
 #####################
 # UTILITY FUNCTIONS
@@ -123,7 +123,7 @@ def mp_store_result_callback(result):
     '''
     logFileLock.acquire()
     if isinstance(result[1],Exception):
-        print_all("*** ERROR: Exception thrown while processing strain {}: {}".format(result[0],pformat(result[1])))
+        print_all("*** ERROR: Exception thrown while processing strain {}: {}".format(result[0],pprint.pformat(result[1])))
     else:
         print_all("Now reconstructing strain {}".format(result[0]))
         resultTable[result[0]] = result[1]
