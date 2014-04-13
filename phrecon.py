@@ -33,6 +33,7 @@
 # 8/4/2013 - Version 3.1 - Andrew Pann, Reverted to normal port using dictionaries and Biopython (no database).
 # 8/4/2013 - Version 4.0 - Andrew Pann, Added use of multiprocessing.
 # 8/2/2013 - Version 4.1 - Andrew Pann, Added handling of empty strain SNP data.
+# 4/13/2014 - Version 4.2 - Andrew Pann, Fixed handling of single locus SNP data inputs.
 
 import argparse
 import os
@@ -47,7 +48,7 @@ import multiprocessing
 import pprint
 import signal
 
-VERSION = "4.1.1"
+VERSION = "4.2.0"
 
 #####################
 # UTILITY FUNCTIONS
@@ -97,7 +98,7 @@ def mp_reconstruct_strain(myStrainID,myStrainData,myRefData):
        so will return the base reference sequence.
     '''
     try:
-        if len(myStrainData) == 1 and myStrainData[0] == "-1":
+        if len(myStrainData) == 1 and 0 in myStrainData.keys() and myStrainData[0] == "-1":
             strainData = myRefData.copy()
         else:
             strainData = myRefData.copy()
