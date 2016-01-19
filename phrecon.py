@@ -48,7 +48,7 @@ import multiprocessing
 import pprint
 import signal
 
-VERSION = "4.2.0"
+VERSION = "4.3.0"
 
 #####################
 # UTILITY FUNCTIONS
@@ -178,14 +178,14 @@ if __name__ == '__main__':
     lineNumber=0
 
     # Expect reference data to be in a two-column format: Loci Base
-    refRe = re.compile("^(?P<locus>\d+)\s+(?P<base>[A-Z]+)$")
+    refRe = re.compile("^(?P<locus>\S+)\s+(?P<base>[A-Z]+)$")
     for line in reffile:
         lineNumber += 1
 
 
         refMatch = refRe.match(line)
         if refMatch:
-            locus = int(refMatch.group('locus'))
+            locus = str(refMatch.group('locus'))
             base = refMatch.group('base')
             # Check for conflict.  Fail if mismatched base at locus, ignore if identical base at locus, insert if no row exists.
             if locus in refData:
@@ -198,7 +198,7 @@ if __name__ == '__main__':
             else:
                 refData[locus] = base
         else:
-            print_all("*** ERROR: Reference file format not recognized.  Expected two columns -- [Loci (numeric)] [Base (A-Z)].  Got {} at line {} instead.".format(line,lineNumber))
+            print_all("*** ERROR: Reference file format not recognized.  Expected two columns -- [Loci (alphnumeric)] [Base (A-Z)].  Got {} at line {} instead.".format(line,lineNumber))
             print "Failed.\n"
             sys.exit(1)
 
@@ -215,7 +215,7 @@ if __name__ == '__main__':
     strainCount = 0
     strainNameList = [] # Store strain IDs in a list to preserve order when writing to file later.
     # Expect snp data file lines to be in a three-column format: StrainID Loci Base
-    snpRe = re.compile("^(?P<strainid>\S+)\t(?P<locus>\d+|(-1))\t(?P<base>[A-Z]+|-)$")
+    snpRe = re.compile("^(?P<strainid>\S+)\t(?P<locus>\S+|(-1))\t(?P<base>[A-Z]+|-)$")
     currentStrain = ""
     snpData = {}
     for line in infile:
@@ -230,7 +230,7 @@ if __name__ == '__main__':
             sys.exit(1)
 
         strainid = snpMatch.group('strainid')
-        locus = int(snpMatch.group('locus'))
+        locus = str(snpMatch.group('locus'))
         base = snpMatch.group('base')
 
         if currentStrain != strainid:
