@@ -48,7 +48,7 @@ import multiprocessing
 import pprint
 import signal
 
-VERSION = "4.3.0"
+VERSION = "4.4.0"
 
 #####################
 # UTILITY FUNCTIONS
@@ -179,6 +179,10 @@ if __name__ == '__main__':
 
     # Expect reference data to be in a two-column format: Loci Base
     refRe = re.compile("^(?P<locus>\S+)\s+(?P<base>[A-Z]+)$")
+
+    # For multichromosome input from VCF files (e.g. locus looks like XYZabc-124), grab the real locus position at the end if need be.
+    multichromRe = re.compile("^\S+-(?P<realLocus>\d+)$")
+
     for line in reffile:
         lineNumber += 1
 
@@ -186,6 +190,15 @@ if __name__ == '__main__':
         refMatch = refRe.match(line)
         if refMatch:
             locus = str(refMatch.group('locus'))
+
+            # Parse out actual locus number if multi-chromosome (chrom+pos) format is given. 
+            # Convert the final position to numeric type, in either case.
+            multichromMatch = multichromRe.match(locus)
+            if multichromMatch:
+                locus = int(multichromMatch.group('realLocus'))
+            else:
+                locus = int(locus)
+
             base = refMatch.group('base')
             # Check for conflict.  Fail if mismatched base at locus, ignore if identical base at locus, insert if no row exists.
             if locus in refData:
@@ -231,6 +244,15 @@ if __name__ == '__main__':
 
         strainid = snpMatch.group('strainid')
         locus = str(snpMatch.group('locus'))
+
+        # Parse out actual locus number if multi-chromosome (chrom+pos) format is given. 
+        # Convert the final position to numeric type, in either case.
+        multichromMatch = multichromRe.match(locus)
+        if multichromMatch:
+            locus = int(multichromMatch.group('realLocus'))
+        else:
+            locus = int(locus)
+            
         base = snpMatch.group('base')
 
         if currentStrain != strainid:
