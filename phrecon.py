@@ -29,11 +29,6 @@
 #
 # Usage: phrecon.py <reference base file> <SNP loci input file> [-debug] [-quiet]
 #
-# 8/2/2013 - Version 3 - Andrew Pann, Ported version 2.1 of Perl-based Phrecon to Python, using Biopython and Sqlite3.
-# 8/4/2013 - Version 3.1 - Andrew Pann, Reverted to normal port using dictionaries and Biopython (no database).
-# 8/4/2013 - Version 4.0 - Andrew Pann, Added use of multiprocessing.
-# 8/2/2013 - Version 4.1 - Andrew Pann, Added handling of empty strain SNP data.
-# 4/13/2014 - Version 4.2 - Andrew Pann, Fixed handling of single locus SNP data inputs.
 
 import argparse
 import os
@@ -48,7 +43,7 @@ import multiprocessing
 import pprint
 import signal
 
-VERSION = "4.4.0"
+VERSION = "4.5.0"
 
 #####################
 # UTILITY FUNCTIONS
@@ -191,12 +186,12 @@ if __name__ == '__main__':
         if refMatch:
             locus = str(refMatch.group('locus'))
 
-            # Parse out actual locus number if multi-chromosome (chrom+pos) format is given. 
-            # Convert the final position to numeric type, in either case.
+            # If multichrom match, then use lexical sorting on locus value.
             multichromMatch = multichromRe.match(locus)
             if multichromMatch:
-                locus = int(multichromMatch.group('realLocus'))
+                pass
             else:
+                # If it isn't multichrom, then convert it to integer for numeric sort.
                 locus = int(locus)
 
             base = refMatch.group('base')
@@ -245,11 +240,11 @@ if __name__ == '__main__':
         strainid = snpMatch.group('strainid')
         locus = str(snpMatch.group('locus'))
 
-        # Parse out actual locus number if multi-chromosome (chrom+pos) format is given. 
-        # Convert the final position to numeric type, in either case.
+        # If multichrom, treat as string (default) for lexical sorting, otherwise
+        # convert to numeric sorting for regular snps
         multichromMatch = multichromRe.match(locus)
         if multichromMatch:
-            locus = int(multichromMatch.group('realLocus'))
+            pass
         else:
             locus = int(locus)
             
