@@ -1,0 +1,7 @@
+This directory contains an experimental python3 port of phrecon.
+
+Required modules:
+
+biopython
+
+Usage syntax should be the same as the python2 version.
